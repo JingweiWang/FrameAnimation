@@ -1,0 +1,4 @@
+include ':app', ':frameanimationlib'
+
+def submoduleProject = project(':frameanimationlib')
+submoduleProject.name = 'frameanimation'
