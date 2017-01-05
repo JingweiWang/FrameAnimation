@@ -1,5 +1,9 @@
 # FrameAnimation
 
+[![Download](https://api.bintray.com/packages/jingweiwang/maven/FrameAnimation/images/download.svg) ](https://bintray.com/jingweiwang/maven/FrameAnimation/_latestVersion)
+
+FrameAnimation is a powerful library for displaying frame animation in Android applications.
+
 ### *Requirements*
 
 FrameAnimation can be included in any Android application.
@@ -14,9 +18,29 @@ If you are building with Gradle, simply add the following line to the `dependenc
 compile 'io.github.jingweiwang.library:FrameAnimation:0.0.1-init'
 ```
 
+### *Attention Please*
+
+FrameAnimation now longer has a direct dependency on the Android Support library. Instead, it expects certain part of the support library to be provided by the including application. If you do not include the Android Support Library yourself already, you will have to add the following line to your build.gradle file:
+
+```groovy
+compile 'com.android.support:appcompat-v7:25.1.0'
+```
+
+### *Join the FrameAnimation community*
+
+Please use our [issues page](https://github.com/JingweiWang/FrameAnimation/issues) to let us know of any problems.
+
+Welcom to pull requests.
+
+### *Donate*
+
+If you willing to spend 10 Yuan on me lunch, please take out your mobile phone, open Alipay or WeChat to scan QR code. I will be appreciate you.
+
+![Donate](./donate.png)
+
 ### *License*
 
-Gson is released under the [Apache 2.0 license](LICENSE).
+FrameAnimation is released under the [Apache 2.0 license](LICENSE).
 
 ```
 Copyright 2017 JingweiWang
