@@ -1,5 +1,8 @@
 language: android
 sudo: false
+jdk:
+  - oraclejdk8
+
 android:
   components:
   - platform-tools
@@ -8,22 +11,28 @@ android:
   - android-25
   - extra-android-m2repository
   - extra-android-support
+
 before_install:
   - chmod +x gradlew
+
 script:
   - ./gradlew :frameanimation:clean
   - ./gradlew :frameanimation:javadoc
   - ./gradlew :frameanimation:javadocJar
   - ./gradlew :frameanimation:sourcesJar
   - ./gradlew :frameanimation:install
+
 after_script:
   - ./gradlew :frameanimation:bintrayUpload
+
 notifications:
   email: false
+
 cache:
   directories:
   - $HOME/.m2
   - $HOME/.gradle
+
 deploy:
   provider: releases
   api_key:
