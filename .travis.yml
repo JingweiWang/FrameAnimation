@@ -16,7 +16,7 @@ before_install:
   - chmod +x gradlew
 
 script:
-   - ./gradlew clean build install
+   - ./gradlew :frameanimation:clean :frameanimation:build :frameanimation:install
 
 notifications:
   email: false
@@ -44,4 +44,4 @@ deploy:
     tags: true
 
 after_deploy:
-    - ./gradlew bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+    - ./gradlew :frameanimation:bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayKey=$BINTRAY_KEY -PdryRun=false
