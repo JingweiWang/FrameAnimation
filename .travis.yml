@@ -44,6 +44,4 @@ deploy:
     tags: true
 
 after_deploy:
-  - ./gradlew bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayKey=$BINTRAY_KEY -PdryRun=false
-  on:
-      tags: true
+    - ./gradlew bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayKey=$BINTRAY_KEY -PdryRun=false
