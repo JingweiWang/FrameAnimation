@@ -44,4 +44,4 @@ deploy:
     tags: true
 
 after_deploy:
-    - ./gradlew :frameanimation:bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+    - ./gradlew :frameanimation:bintrayUpload

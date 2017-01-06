@@ -67,21 +67,20 @@ install {
         }
     }
 }
-
 Properties properties = new Properties()
-boolean isHasFile = false
-if (project.rootProject.findProject('local.properties') != null) {
-    isHasFile = true
+String temp_user, temp_key
+try {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
+} catch (FileNotFoundException Ignored) {
 }
+temp_user = properties.getProperty("bintray.user", System.getenv("BINTRAY_USERNAME"))
+temp_key = properties.getProperty("bintray.apikey", System.getenv("BINTRAY_KEY"))
 
 bintray {
-    if (isHasFile) {
-        user = properties.getProperty("bintray.user")
-        key = properties.getProperty("bintray.apikey")
-    }
+    user = temp_user
+    key = temp_key
 
-    configurations = ['published', 'archives']
+    configurations = ['archives']
     publish = true
 
     pkg {
