@@ -1,5 +1,0 @@
-include ':frameanimationlib'
-include ':samples:demo'
-
-def submoduleProject = project(':frameanimationlib')
-submoduleProject.name = 'frameanimation'
