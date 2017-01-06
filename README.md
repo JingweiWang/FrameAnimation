@@ -19,6 +19,10 @@ If you are building with Gradle, simply add the following line to the `dependenc
 compile 'io.github.jingweiwang.library:FrameAnimation:0.1.0'
 ```
 
+For full details, visit the documentation on our web site, available in Chinese:
+
+[开始使用](https://jingweiwang.github.io/FrameAnimation/)
+
 ### *Attention Please*
 
 FrameAnimation now longer has a direct dependency on the Android Support library. Instead, it expects certain part of the support library to be provided by the including application. If you do not include the Android Support Library yourself already, you will have to add the following line to your build.gradle file:
