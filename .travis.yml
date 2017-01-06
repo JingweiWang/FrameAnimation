@@ -33,6 +33,20 @@ cache:
   - $HOME/.m2
   - $HOME/.gradle
 
+branches:
+  except:
+    - gh-pages
+
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
+env:
+  global:
+  - secure: jhSrJciiw+kE2TW2WWzJaBlJmLPSXUikkRVttkv1F/FvMOZ2zipFHz3BienSctHX3tPFUK1WVlF0vW4bGemYHoAMskJ3f58u87dNPBxtmyXRhPvAWZQ6m2k7v91Md2+coQhv+CogM19uISmz/SsM0QreLVH2HKqDzsYfZl3FT9Ko7RIZzpFxAtEheHQktrgdKw7n7kuAs7sfvdM2prKwtNuRYG1hB+DuQiX8JatBuh/NJwOMY8jzWp2KHrhbV9oI1oipPZjQfHosqHCCe87nDOOKmN/MW3DKhc1Re935YrhpPaEyakhjkOFeItFzpMZs6hbbtCMqlws85EQ0FVPOwisXMjlld0EzkULb+Li2yyrksFqv14Y6mIH0uuEm76n2w8MSFGnbEg2fzzn93E07GnSU3k6ise5stXd3wqGjY8o8NpzDeSFj+kwQ25oJUcVlcFdiru6lIylsnKloCIk2vr/K22obE/SV/9ef74y5DNAKqUpsZHxm/8oqtpMEgcRPMMKlZHkt//q9/AxOSCXX3heCoTZglEtlzDuKFLFHoeLyuw0PrcwrEbeCFZGktIF/niyLlGKDdotVkWdM+Fvtg1S5APe4YBnQTFruxnhWK5nwPq1XW0ffGFdUKOc63sLo30JCDv2cuHUfoGOEeJutisINfeUoM871EPAJwZFwXpo=
+  - secure: GEiIPRw94TSfpxUjCNq7EvGca2rk1o69WTaHdFZK3x0N4eQ3fiOplUoBP2S7Cn5acx8sRFjzIL87qQq1DVM32xuP0j/vtHzbOT7cjf0TsA5hTFmarBjkwfxcdfr9/jxBJahLKfGPHrVN4vnyFdu8RjInsgFVq9sRM6LYCefVXGUt4oEojb6R+z3rU6vNIfAne7gDcqWWB5MkljxjTgp92ulhzWbLY/jOtxznRYTRLriKKbup+nKP3zq8DmNcUZf0GKdtuTBedKVj7xfcsYaE/3BusxjzQWcug3RHjoxnzjEvBOIYvYXPlTF2nqhNlCYyRegptZWXGPnoA90J4V21tKqGn3PG52QJe7V/NZ4cxKK9MDq8tGFHBc7mOrmCSzjMIHd5aDySV27j73VD5Cox4nVqQZIzRJ895PtzjGSMwCTj/mqAUuTrOPDpL23Z5+OPSap1bJY1Q4+sJQQU3pBOAbGwuVLlR9ftK/KZJkKjVSrMMWcrLyeezSsH4ro844OBLdVwUGZMOs/ypqObZCfrsvmPEeK3ILy+CqeBf7isrfp3sSKHYUf9oKkJyGPH/YxKgVCptjEf81hGe2/PqEN+1/5SJYgXWvFcGgcsN+reupwqO9tpw9FRdG1fVMjuoQZKDqI0vh0HeDQKrGFhHf+CS+igOSsXCpfmh5ejMA68pt0=
+
 deploy:
   provider: releases
   api_key:
