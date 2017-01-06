@@ -16,12 +16,7 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - ./gradlew :frameanimation:bundleRelease
-  - ./gradlew :frameanimation:javadoc
-  - ./gradlew :frameanimation:javadocJar
-  - ./gradlew :frameanimation:sourcesJar
-  - ./gradlew :frameanimation:install
-  - ./gradlew :frameanimation:bintrayUpload
+   - ./gradlew clean build install
 
 notifications:
   email: false
@@ -40,11 +35,6 @@ addons:
     packages:
       - oracle-java8-installer
 
-env:
-  global:
-  - secure: HfEULbkJlukHJW+3Qyd/IiiZ3+ZGaNs4ADNI1L+Q4BtsxCZk6HCW2YptuBIVkb2E3PlBZpkLg/xwvsfFYggV9k9oxU5oCvlCVbSAEMZgc5ec/TXyVx73pf/bKkE+diT2o5l3xrDzymvWYnbHteNveAWvNXpCIw+lUxIxvD5HPCDb0VsFkG4fslLZi6RSDIurWto9/E0Y3y2s66WmYMwrKWG9WIHsD/8UWMEGjEKAvER2dHxmcnzF0h1byaigBmC9ifZjWEgTXiWmQj2/2F1tRhVXjyia/sZ8QW5fQANFN52b+lusbiWQ9Jd0hkkjsEUuIvrQuTlbHkcdSBGGZS66/TyjFFh3BVP3zmgnS4pMZKCUEtS+EIP/la2mb0HCXL72ZrOVakS/SolHix6rQIYa4CB4ZXBPemISwJdx1NY/omMo5QEmrUouXlvqkwIUs/TJFbRIM7FxOhOGjL3N4VtU55Dsp8xAbfgQTt66EYp/31UloH3fAdHZjowEPk38O7xS4JIhWeu5vEP8e0lzpV4u6q2x6lFhR+/OTIJJk99IY3ud1eoXaYZuRiblDl96SJB50ObtC+rh8Io7kOhIs2ltzyJ8I2hxhG2TJUgVS1rG12CSl9Y0LP6IUd4RrzB3NUHWOKOqacpCroyzcqnfmPrSDoK6rIwUUpK/hkhqxmbMJYo=
-  - secure: Ra4lH3ddt+4judVJAU6nbdmTWcvWWIeL6dNY3F/AVnojH1drxuWp6tNqvEfJvGa5Jq6hFUoVi2CMVJkEjzy4R8d5qfz2nLx6DeCzxqVGEYUrlTG7zQkKn5EtQJucxEQFCelFC8wjumA0OFpHHKNlE3Rit+0zVx8cwUMHpWkoqzSqAZe1L3ci4ws9aaYflul1NYE4G8FEVVpSKm0dhZeeJVk4xBx9J4i+GAmMtqaHZyo4q/xlNyWpJFnWPfSdNgXlBvs/LFYLVOSsVVbm+2MCOorCYm+/ANKJ8m6XjilfVwdG/Wbxtn9ODKeQ9mML7WxiUeLKs+tc/yiFAUhXtSCc9By6IsCfYa6MaHwQpsVvPMF5TGZwT2B7Uw1QDZ+g89NNT8IMbumNJ4inNPhD8JCn2oztkexpOPPKTMXK0YH8J4CtCW8TvlRNLi/ishWAWqoxz5UNjjyX6jRpOKh66W662NAzWE1HsQZVa9Pxyg54ZyjTe71e74+Aw+udcrQ2mgGDfTok1G8Bp82qNxt6ATOMNq9Q1XNlk20vQO8lc0ihUwFPf3oSW94AqPvTRLVfkEa7DgXt8dubuZK2l3uthrmFfzoDaHLuIhtKajd780bY53kIqvC2GBVgO4A+XPlUM96oie+MaatEsmxUWY23xuGnAQneHNI/A/f7h+UQGClU9iE=
-
 deploy:
   provider: releases
   api_key:
@@ -52,3 +42,8 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
+
+after_deploy:
+  - ./gradlew bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayKey=$BINTRAY_KEY -PdryRun=false
+  on:
+      tags: true

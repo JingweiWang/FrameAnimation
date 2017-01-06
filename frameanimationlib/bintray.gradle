@@ -76,8 +76,10 @@ if (project.rootProject.findProject('local.properties') != null) {
 }
 
 bintray {
-    user = isHasFile ? properties.getProperty("bintray.user") : System.getenv("bintray.user")
-    key = isHasFile ? properties.getProperty("bintray.apikey") : System.getenv("bintray.apikey")
+    if (isHasFile) {
+        user = properties.getProperty("bintray.user")
+        key = properties.getProperty("bintray.apikey")
+    }
 
     configurations = ['published', 'archives']
     publish = true
