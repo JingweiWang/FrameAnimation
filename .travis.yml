@@ -5,8 +5,8 @@ jdk:
 
 android:
   components:
-  - platform-tools
-  - tools
+  - platform-tools-25.2.4
+  - tools-25.0.3
   - build-tools-25.0.2
   - android-25
   - extra-android-m2repository
@@ -16,13 +16,11 @@ before_install:
   - chmod +x gradlew
 
 script:
-  - ./gradlew :frameanimation:clean
+  - ./gradlew :frameanimation:bundleRelease
   - ./gradlew :frameanimation:javadoc
   - ./gradlew :frameanimation:javadocJar
   - ./gradlew :frameanimation:sourcesJar
   - ./gradlew :frameanimation:install
-
-after_script:
   - ./gradlew :frameanimation:bintrayUpload
 
 notifications:
@@ -51,5 +49,6 @@ deploy:
   provider: releases
   api_key:
     secure: O70we/0Xq77WYizyJVILlhBq2UaL49wnkLx3ocPLN2xoDlyosPhDOWUCAaTNyY3qYzHp1s29HNfWqMmM6Q+4AtNHeb5bqPgdnaR6LUSFinlCdefrbFFtcQO4IWHylC6GC02O1e444lDxa54a2lSR+hy3GpGolKwSFtjth9IZhCE+cGM1ZvV/GE/QMbJbgFpUyVZW8DXVPiyhQP/QyjNcEYlTXVbKoIdRYhRS3+qMOoQX+edQxtlTz2sN5bqw/DXkLV/hyCb41GwpG9NvkFpqUXrRWvPvygdZsAEfkDfEPGO0YGtNlSclfheQ/1YF3xCwMaxBHJ+JoDBTXJdUd+FAPxv437vvUd/z/H4qCZC1S+mC9FG89BZtsCAGpK4VGKINxOZI1j01kvh5WxV2p12e8erH91876LAUfEkDzMPuKez7vocgd6mUw/la+8adBAyMFuhD76cEDlTc2K+RZrQWzoliqBrtNDq2L8nNAGncf1vf0N+zqMDOT3UcBDBqA1c8j35QDWF8/yA9+/iEERarDX30Liv33chseI0FQIK+s2RR1xbVznuRhKeSu7ufxYDmSU5hWvRuJXlD4NYBVHQAF7VkjNAD3+b0+8g2tVtb6u5M3Zm3XXhnNAddTGwCPzD54+vSTFshFfz5FTxzRYDxXdEiBkPL1j4+8mCMvy2iNTQ=
+  skip_cleanup: true
   on:
     tags: true
