@@ -2,6 +2,7 @@
 
 [![Download](https://api.bintray.com/packages/jingweiwang/maven/FrameAnimation/images/download.svg) ](https://bintray.com/jingweiwang/maven/FrameAnimation/_latestVersion)
 [![Build Status](https://travis-ci.org/JingweiWang/FrameAnimation.svg?branch=master)](https://travis-ci.org/JingweiWang/FrameAnimation)
+[![Coverage Status](https://coveralls.io/repos/github/JingweiWang/FrameAnimation/badge.svg)](https://coveralls.io/github/JingweiWang/FrameAnimation)
 
 FrameAnimation is a powerful library for displaying frame animation in Android applications.
 
