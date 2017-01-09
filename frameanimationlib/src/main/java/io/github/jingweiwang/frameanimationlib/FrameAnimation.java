@@ -31,7 +31,7 @@ import android.widget.ImageView;
 import java.io.InputStream;
 
 public class FrameAnimation {
-    private final int duration = 40;
+    private int duration = 40;
     private Context context;
     private ImageView imageView;
     private View parentView;
@@ -41,14 +41,29 @@ public class FrameAnimation {
     private int frameCount;
     private boolean loop = false;
 
-    public FrameAnimation(Context context, ImageView imageView, int[] pFrameRess) {
+    /**
+     * 初始化一个帧序列动画资源
+     *
+     * @param context   当前上下文
+     * @param imageView 容器
+     * @param frameRess 图像资源号数组
+     */
+    public FrameAnimation(Context context, ImageView imageView, int[] frameRess) {
         this.context = context.getApplicationContext();
         this.imageView = imageView;
-        this.frameRess = pFrameRess;
-        this.frameCount = pFrameRess.length - 1;
+        this.frameRess = frameRess;
+        this.frameCount = frameRess.length - 1;
         initLruCache();
     }
 
+    /**
+     * 初始化一个帧序列动画资源
+     *
+     * @param context       当前上下文
+     * @param imageView     容器
+     * @param frameRes_head 首个图像资源号
+     * @param totle         图像资源个数
+     */
     public FrameAnimation(Context context, ImageView imageView, @DrawableRes int frameRes_head, int totle) {
         this.context = context.getApplicationContext();
         this.imageView = imageView;
@@ -57,6 +72,9 @@ public class FrameAnimation {
         initLruCache();
     }
 
+    /**
+     * 帧序列动画开始播放, 只进行一次并且停在最后一帧
+     */
     public void startOnce() {
         preDisplay(frameRess);
         while (true) {
@@ -69,9 +87,11 @@ public class FrameAnimation {
     }
 
     /**
-     * 帧动画只进行一次
+     * 帧序列动画开始播放, 只进行一次并且消失
      *
-     * @param parentView 如果不需要父控件消失, 此参数可以为 null .
+     * @param parentView 帧序列动画容器的父容器
+     *                   <p>
+     *                   P.S.如果不需要父控件消失, 此参数可以为 null .
      */
     public void startOnceAndGone(@Nullable View parentView) {
         preDisplay(frameRess);
@@ -93,6 +113,9 @@ public class FrameAnimation {
         }
     }
 
+    /**
+     * 帧序列动画开始循环播放
+     */
     public void startLoop() {
         if (!loop) {
             this.loop = true;
@@ -107,8 +130,30 @@ public class FrameAnimation {
         }
     }
 
+    /**
+     * 帧序列动画停止循环播放, 停在播放的当前帧
+     */
     public void stopLoop() {
         this.loop = false;
+    }
+
+    /**
+     * 获取每帧的持续时间
+     *
+     * @return 每帧的持续时间, 单位为毫秒
+     */
+    public int getDuration() {
+        return duration;
+    }
+
+    /**
+     * 设置每帧的持续时间
+     *
+     * @param duration 单位为毫秒, 默认值为40毫秒
+     */
+    public FrameAnimation setDuration(int duration) {
+        this.duration = duration;
+        return this;
     }
 
     private void initLruCache() {

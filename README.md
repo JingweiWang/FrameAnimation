@@ -1,6 +1,6 @@
 # FrameAnimation
 
-[![Download](https://api.bintray.com/packages/jingweiwang/maven/FrameAnimation/images/download.svg) ](https://bintray.com/jingweiwang/maven/FrameAnimation/_latestVersion)
+[![Download](https://api.bintray.com/packages/jingweiwang/maven/FrameAnimation/images/download.svg)](https://bintray.com/jingweiwang/maven/FrameAnimation/_latestVersion)
 [![Build Status](https://travis-ci.org/JingweiWang/FrameAnimation.svg?branch=master)](https://travis-ci.org/JingweiWang/FrameAnimation)
 [![Coverage Status](https://coveralls.io/repos/github/JingweiWang/FrameAnimation/badge.svg)](https://coveralls.io/github/JingweiWang/FrameAnimation)
 
@@ -17,7 +17,7 @@ FrameAnimation supports Android 4.0 and later.
 If you are building with Gradle, simply add the following line to the `dependencies` section of your `build.gradle` file:
 
 ```groovy
-compile 'io.github.jingweiwang.library:FrameAnimation:0.1.0'
+compile 'io.github.jingweiwang.library:FrameAnimation:0.2.0'
 ```
 
 For full details, visit the documentation on our web site, available in Chinese:
