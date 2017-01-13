@@ -13,43 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.jingweiwang.demo;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
-public class MainActivity extends AppCompatActivity {
+import io.github.jingweiwang.frameanimationlib.FrameAnimation;
+
+public class LoopActivity extends AppCompatActivity {
+    private FrameAnimation frameAnimation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Button btn_demo_1 = (Button) findViewById(R.id.btn_demo_1);
-        Button btn_demo_2 = (Button) findViewById(R.id.btn_demo_2);
-        Button btn_demo_3 = (Button) findViewById(R.id.btn_demo_3);
-        btn_demo_1.setOnClickListener(new View.OnClickListener() {
+        setContentView(R.layout.activity_loop);
+        Button btn_start = (Button) findViewById(R.id.btn_start);
+        Button btn_stop = (Button) findViewById(R.id.btn_stop);
+        ImageView iv_frame = (ImageView) findViewById(R.id.iv_frame);
+        btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LoopActivity.class);
-                startActivity(intent);
+                start();
             }
         });
-        btn_demo_2.setOnClickListener(new View.OnClickListener() {
+        btn_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, OnceActivity.class);
-                startActivity(intent);
+                stop();
             }
         });
-        btn_demo_3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, OnceAndGoneActivity.class);
-                startActivity(intent);
-            }
-        });
+        frameAnimation = new FrameAnimation(this, iv_frame, Ress.BULLET_FRAME_RESS).setDuration(50);
+    }
+
+    private void start() {
+        frameAnimation.startLoop();
+    }
+
+    private void stop() {
+        frameAnimation.stopLoop();
+    }
+
+    @Override
+    protected void onPause() {
+        frameAnimation.stopLoop();
+        super.onPause();
     }
 }

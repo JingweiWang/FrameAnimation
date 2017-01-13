@@ -13,61 +13,43 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    android:id="@+id/activity_loop"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="io.github.jingweiwang.demo.MainActivity">
+    tools:context="io.github.jingweiwang.demo.LoopActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:gravity="center"
-        android:text="Hello FrameAnimation, Hello JingweiWang!"
+        android:text="DEMO 1. start Loop"
         android:textSize="18sp"
         android:textStyle="normal|bold" />
 
-    <TextView
+    <Button
+        android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="DEMO 1. start Loop" />
+        android:layout_gravity="center"
+        android:text="start Loop" />
 
     <Button
-        android:id="@+id/btn_demo_1"
+        android:id="@+id/btn_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="TEST DEMO 1" />
+        android:layout_gravity="center"
+        android:text="stop Loop" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="DEMO 2. start Once" />
-
-    <Button
-        android:id="@+id/btn_demo_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="TEST DEMO 2" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="DEMO 3. start Once And Gone" />
-
-    <Button
-        android:id="@+id/btn_demo_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="TEST DEMO 3" />
+    <ImageView
+        android:id="@+id/iv_frame"
+        android:layout_width="303dp"
+        android:layout_height="230dp"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:background="@drawable/bullet_0" />
 </LinearLayout>
