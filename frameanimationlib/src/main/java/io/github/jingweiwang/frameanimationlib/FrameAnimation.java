@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntRange;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -33,18 +34,20 @@ import java.util.List;
 
 public class FrameAnimation {
     private final String TAG = getClass().getSimpleName();
-    private int duration = 50;
+
     private Context context;
     private ImageView imageView;
     private Handler handler = new Handler();
     private LruCacheManager<Integer, BitmapDrawable> lruCacheManager;
     private Bitmap.Config bitmapConfig = Bitmap.Config.ALPHA_8;
+    private List<FrameAnimationCallBack> cbFrameAnimationList = new ArrayList<>();
+
     private int[] frameRess;
-    private int frameCount;
+    private int frameRessBound;
     private boolean oneShot = false;
     private boolean running = false;
+    private int duration = 50;
     private int curFrame = 0;
-    private List<FrameAnimationCallBack> cbFrameAnimationList = new ArrayList<>();
 
     /**
      * 初始化一个帧序列动画资源
@@ -57,24 +60,23 @@ public class FrameAnimation {
         this.context = context.getApplicationContext();
         this.imageView = imageView;
         this.frameRess = frameRess;
-        this.frameCount = frameRess.length - 1;
         initLruCache();
     }
 
     /**
      * 初始化一个帧序列动画资源
      *
-     * @param context       当前上下文
-     * @param imageView     容器
-     * @param frameRes_head 首个图像资源号
-     * @param totle         图像资源个数
+     * @param context     当前上下文
+     * @param imageView   容器
+     * @param prefix      图像资源名前缀
+     * @param fristSuffix 首个图像资源名的后缀
+     * @param numberBit   图像资源名后缀位数, 如果为0则按照实际位数设置
+     * @param totle       图像资源个数
      */
-    @Deprecated
-    public FrameAnimation(Context context, ImageView imageView, @DrawableRes int frameRes_head, int totle) {
+    public FrameAnimation(Context context, ImageView imageView, String prefix, @IntRange(from = 0) int fristSuffix, @IntRange(from = 0, to = 5) int numberBit, @IntRange(from = 1) int totle) {
         this.context = context.getApplicationContext();
         this.imageView = imageView;
-        this.frameRess = getFrameRess(frameRes_head, totle);
-        this.frameCount = totle - 1;
+        this.frameRess = getFrameRess(prefix, fristSuffix, numberBit, totle);
         initLruCache();
     }
 
@@ -207,11 +209,16 @@ public class FrameAnimation {
         lruCacheManager = new LruCacheManager<>();
     }
 
-    private int[] getFrameRess(@DrawableRes int frameRes_head, int totle) {
-        long head = frameRes_head;
+    private int[] getFrameRess(String prefix, int fristSuffix, int numberBit, int totle) {
         int[] frameRess = new int[totle];
-        for (int i = 0; i < totle; i++, head++) {
-            frameRess[i] = (int) (head);
+        String suffix;
+        for (int i = 0; i < totle; i++) {
+            if (0 != numberBit) {
+                suffix = String.format("%0" + numberBit + "d", fristSuffix + i);
+            } else {
+                suffix = String.valueOf(fristSuffix + i);
+            }
+            frameRess[i] = context.getResources().getIdentifier(prefix + suffix, "drawable", context.getPackageName());
         }
         return frameRess;
     }
@@ -224,20 +231,20 @@ public class FrameAnimation {
                     if (!oneShot) {
                         displayImage(frameRess[frameNo]);
                         curFrame = frameNo;
-                        if (frameNo == frameCount) {
+                        if (curFrame == frameRessBound) {
                             playConstant(0);
                         } else {
-                            playConstant(frameNo + 1);
+                            playConstant(curFrame + 1);
                         }
                     } else {
                         displayImage(frameRess[frameNo]);
                         curFrame = frameNo;
-                        if (frameNo == frameCount) {
+                        if (curFrame == frameRessBound) {
                             curFrame = 0;
                             running = false;
                             setCbEnd();
                         } else {
-                            playConstant(frameNo + 1);
+                            playConstant(curFrame + 1);
                         }
                     }
                 } else {
@@ -267,6 +274,7 @@ public class FrameAnimation {
     }
 
     private void preDisplay(int[] frameRess) {
+        this.frameRessBound = frameRess.length - 1;
         for (int ResId : frameRess) {
             if (lruCacheManager.get(ResId) == null || lruCacheManager.get(ResId).getBitmap().isRecycled()) {
                 BitmapFactory.Options opt = new BitmapFactory.Options();
