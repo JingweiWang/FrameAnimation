@@ -30,9 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AndroidNativeFAActivity" />
         <activity android:name=".LoopActivity" />
         <activity android:name=".OnceActivity" />
-        <activity android:name=".OnceAndGoneActivity"></activity>
+        <activity android:name=".OnceAndGoneActivity" />
     </application>
 
 </manifest>

@@ -27,9 +27,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button btn_demo_android_native = (Button) findViewById(R.id.btn_demo_android_native);
         Button btn_demo_1 = (Button) findViewById(R.id.btn_demo_1);
         Button btn_demo_2 = (Button) findViewById(R.id.btn_demo_2);
         Button btn_demo_3 = (Button) findViewById(R.id.btn_demo_3);
+
+        btn_demo_android_native.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AndroidNativeFAActivity.class);
+                startActivity(intent);
+            }
+        });
         btn_demo_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

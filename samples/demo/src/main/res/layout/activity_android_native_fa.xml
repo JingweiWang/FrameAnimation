@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_android_native_fa"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="io.github.jingweiwang.demo.AndroidNativeFAActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="DEMO 0. Android native (MAY BE OOM)"
+        android:textSize="18sp"
+        android:textStyle="normal|bold" />
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="start" />
+
+    <ImageView
+        android:id="@+id/iv_frame"
+        android:layout_width="303dp"
+        android:layout_height="230dp"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:background="@drawable/bullet_anim" />
+</LinearLayout>

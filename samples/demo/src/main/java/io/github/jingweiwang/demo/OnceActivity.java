@@ -17,13 +17,15 @@ package io.github.jingweiwang.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import io.github.jingweiwang.frameanimationlib.FrameAnimation;
 
-public class OnceActivity extends AppCompatActivity {
+public class OnceActivity extends AppCompatActivity implements FrameAnimation.FrameAnimationCallBack {
+    private final String TAG = getClass().getSimpleName();
     private FrameAnimation frameAnimation;
 
     @Override
@@ -38,10 +40,39 @@ public class OnceActivity extends AppCompatActivity {
                 start();
             }
         });
-        frameAnimation = new FrameAnimation(this, iv_frame, Ress.BULLET_FRAME_RESS).setDuration(50);
+        frameAnimation = new FrameAnimation(this, iv_frame, Ress.BULLET_FRAME_RESS)
+                .setDuration(50)
+                .setOneShot(true)
+                .setFrameAnimationCallBack(this);
     }
 
     private void start() {
-        frameAnimation.startOnce();
+        frameAnimation.start();
+    }
+
+    @Override
+    protected void onPause() {
+        frameAnimation.stop();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        frameAnimation.clearCache();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onFrameAnimationStart(FrameAnimation frameAnimation) {
+        if (this.frameAnimation.equals(frameAnimation)) {
+            Log.e(TAG, "onFrameAnimationStart");
+        }
+    }
+
+    @Override
+    public void onFrameAnimationEnd(FrameAnimation frameAnimation) {
+        if (this.frameAnimation.equals(frameAnimation)) {
+            Log.e(TAG, "onFrameAnimationEnd");
+        }
     }
 }
