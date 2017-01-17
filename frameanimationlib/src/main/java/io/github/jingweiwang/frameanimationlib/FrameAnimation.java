@@ -23,23 +23,28 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.RawRes;
-import android.view.View;
+import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FrameAnimation {
-    private int duration = 40;
+    private final String TAG = getClass().getSimpleName();
+    private int duration = 50;
     private Context context;
     private ImageView imageView;
-    private View parentView;
     private Handler handler = new Handler();
     private LruCacheManager<Integer, BitmapDrawable> lruCacheManager;
+    private Bitmap.Config bitmapConfig = Bitmap.Config.ALPHA_8;
     private int[] frameRess;
     private int frameCount;
-    private boolean loop = false;
+    private boolean oneShot = false;
+    private boolean running = false;
+    private int curFrame = 0;
+    private List<FrameAnimationCallBack> cbFrameAnimationList = new ArrayList<>();
 
     /**
      * 初始化一个帧序列动画资源
@@ -64,6 +69,7 @@ public class FrameAnimation {
      * @param frameRes_head 首个图像资源号
      * @param totle         图像资源个数
      */
+    @Deprecated
     public FrameAnimation(Context context, ImageView imageView, @DrawableRes int frameRes_head, int totle) {
         this.context = context.getApplicationContext();
         this.imageView = imageView;
@@ -73,68 +79,33 @@ public class FrameAnimation {
     }
 
     /**
-     * 帧序列动画开始播放, 只进行一次并且停在最后一帧
+     * Starts the animation from the first frame, looping if necessary.
      */
-    public void startOnce() {
+    public void start() {
+        if (running) {
+            Log.w(TAG, "This frame animation is already running.");
+            return;
+        }
         preDisplay(frameRess);
         while (true) {
             if (checkCached(frameRess)) {
-                displayImage(frameRess[0]);
-                playConstantOnce(1);
+                running = true;
+                setCbStart();
+                playConstant(curFrame);
                 break;
             }
         }
     }
 
     /**
-     * 帧序列动画开始播放, 只进行一次并且消失
-     *
-     * @param parentView 帧序列动画容器的父容器
-     *                   <p>
-     *                   P.S.如果不需要父控件消失, 此参数可以为 null .
+     * Stops the animation at the current frame.
      */
-    public void startOnceAndGone(@Nullable View parentView) {
-        preDisplay(frameRess);
-        if (parentView != null) {
-            this.parentView = parentView;
-            this.parentView.bringToFront();
-            this.parentView.setVisibility(View.VISIBLE);
-        } else {
-            this.parentView = null;
+    public void stop() {
+        if (!running) {
+            Log.w(TAG, "This frame animation is not running.");
+            return;
         }
-        imageView.bringToFront();
-        imageView.setVisibility(View.VISIBLE);
-        while (true) {
-            if (checkCached(frameRess)) {
-                displayImage(frameRess[0]);
-                playConstantOnceAndGone(1);
-                break;
-            }
-        }
-    }
-
-    /**
-     * 帧序列动画开始循环播放
-     */
-    public void startLoop() {
-        if (!loop) {
-            this.loop = true;
-            preDisplay(frameRess);
-            while (true) {
-                if (checkCached(frameRess)) {
-                    displayImage(frameRess[0]);
-                    playConstantLoop(1);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * 帧序列动画停止循环播放, 停在播放的当前帧
-     */
-    public void stopLoop() {
-        this.loop = false;
+        running = false;
     }
 
     /**
@@ -149,10 +120,86 @@ public class FrameAnimation {
     /**
      * 设置每帧的持续时间
      *
-     * @param duration 单位为毫秒, 默认值为40毫秒
+     * @param duration 单位为毫秒, 默认值为50毫秒
      */
     public FrameAnimation setDuration(int duration) {
         this.duration = duration;
+        return this;
+    }
+
+    /**
+     * 获取当前的重复状态
+     *
+     * @return 如果是 true, 则只播放一次; 否则重复播放
+     */
+    public boolean isOneShot() {
+        return oneShot;
+    }
+
+    /**
+     * Sets whether the animation should play once or repeat.
+     *
+     * @param oneShot Pass true if the animation should only play once
+     */
+    public FrameAnimation setOneShot(boolean oneShot) {
+        this.oneShot = oneShot;
+        return this;
+    }
+
+    /**
+     * 选择图片Bitmap.Config参数
+     *
+     * @param config 可选 ALPHA_8, RGB_565, ARGB_8888
+     */
+    public FrameAnimation setBitmapConfig(Bitmap.Config config) {
+        this.bitmapConfig = config;
+        return this;
+    }
+
+    /**
+     * 获取当前帧序数
+     *
+     * @return 当前帧序数
+     */
+    public int getCurFrame() {
+        return curFrame;
+    }
+
+    /**
+     * 重置当前帧序数
+     * <p>
+     * 当使用 stop() 后调用此参数再次使用 start(), 会从首帧开始播放
+     */
+    public FrameAnimation reset() {
+        if (running) {
+            Log.w(TAG, "This frame animation is already running, forbidden to reset.");
+            return this;
+        }
+        this.curFrame = 0;
+        return this;
+    }
+
+    /**
+     * Indicates whether the animation is currently running or not.
+     *
+     * @return true if the animation is running, false otherwise
+     */
+    public boolean isRunning() {
+        return running;
+    }
+
+    /**
+     * 清除当前动画缓存, 当不再使用时, 请手动调用此方法
+     */
+    public void clearCache() {
+        lruCacheManager.clearLruCache();
+    }
+
+    /**
+     * 设置frameAnimation回调
+     */
+    public FrameAnimation setFrameAnimationCallBack(FrameAnimationCallBack frameAnimationCallBack) {
+        this.cbFrameAnimationList.add(frameAnimationCallBack);
         return this;
     }
 
@@ -169,55 +216,54 @@ public class FrameAnimation {
         return frameRess;
     }
 
-    private void playConstantOnce(final int frameNo) {
+    private void playConstant(final int frameNo) {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                displayImage(frameRess[frameNo]);
-                if (frameNo == frameCount) {
-                    lruCacheManager.clearLruCache();
-                } else {
-                    playConstantOnce(frameNo + 1);
-                }
-            }
-        }, duration);
-    }
-
-    private void playConstantOnceAndGone(final int frameNo) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                displayImage(frameRess[frameNo]);
-                if (frameNo == frameCount) {
-                    if (parentView != null) {
-                        parentView.setVisibility(View.GONE);
-                        parentView = null;
-                    }
-                    imageView.setVisibility(View.GONE);
-                    lruCacheManager.clearLruCache();
-                } else {
-                    playConstantOnceAndGone(frameNo + 1);
-                }
-            }
-        }, duration);
-    }
-
-    private void playConstantLoop(final int frameNo) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (loop) {
-                    displayImage(frameRess[frameNo]);
-                    if (frameNo == frameCount) {
-                        playConstantLoop(0);
+                if (running) {
+                    if (!oneShot) {
+                        displayImage(frameRess[frameNo]);
+                        curFrame = frameNo;
+                        if (frameNo == frameCount) {
+                            playConstant(0);
+                        } else {
+                            playConstant(frameNo + 1);
+                        }
                     } else {
-                        playConstantLoop(frameNo + 1);
+                        displayImage(frameRess[frameNo]);
+                        curFrame = frameNo;
+                        if (frameNo == frameCount) {
+                            curFrame = 0;
+                            running = false;
+                            setCbEnd();
+                        } else {
+                            playConstant(frameNo + 1);
+                        }
                     }
                 } else {
-                    lruCacheManager.clearLruCache();
+                    curFrame = frameNo;
+                    setCbEnd();
                 }
             }
         }, duration);
+    }
+
+    private void setCbStart() {
+        if (cbFrameAnimationList.isEmpty()) return;
+        for (FrameAnimationCallBack frameAnimationCallBack : cbFrameAnimationList) {
+            if (frameAnimationCallBack != null) {
+                frameAnimationCallBack.onFrameAnimationStart(this);
+            }
+        }
+    }
+
+    private void setCbEnd() {
+        if (cbFrameAnimationList.isEmpty()) return;
+        for (FrameAnimationCallBack frameAnimationCallBack : cbFrameAnimationList) {
+            if (frameAnimationCallBack != null) {
+                frameAnimationCallBack.onFrameAnimationEnd(this);
+            }
+        }
     }
 
     private void preDisplay(int[] frameRess) {
@@ -225,7 +271,7 @@ public class FrameAnimation {
             if (lruCacheManager.get(ResId) == null || lruCacheManager.get(ResId).getBitmap().isRecycled()) {
                 BitmapFactory.Options opt = new BitmapFactory.Options();
                 opt.inJustDecodeBounds = false;
-                opt.inPreferredConfig = Bitmap.Config.ALPHA_8;
+                opt.inPreferredConfig = bitmapConfig;
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
                     opt.inPurgeable = true;
                     opt.inInputShareable = true;
@@ -234,6 +280,10 @@ public class FrameAnimation {
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, opt);
                 BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), bitmap);
                 lruCacheManager.put(ResId, bitmapDrawable);
+                try {
+                    inputStream.close();
+                } catch (IOException ignored) {
+                }
             }
         }
     }
@@ -248,12 +298,31 @@ public class FrameAnimation {
         return checkResult;
     }
 
-    private void displayImage(@RawRes int ResId) {
+    private void displayImage(@DrawableRes int ResId) {
         if (lruCacheManager.get(ResId) == null) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             imageView.setBackground(lruCacheManager.get(ResId));
         } else {
             imageView.setBackgroundDrawable(lruCacheManager.get(ResId));
         }
+    }
+
+    /**
+     * frameAnimation播放状态的监听回调
+     */
+    public interface FrameAnimationCallBack {
+        /**
+         * 当frameAnimation开始时回调此方法
+         *
+         * @param frameAnimation 当前frameAnimation对象
+         */
+        void onFrameAnimationStart(FrameAnimation frameAnimation);
+
+        /**
+         * 当frameAnimation结束时回调此方法
+         *
+         * @param frameAnimation 当前frameAnimation对象
+         */
+        void onFrameAnimationEnd(FrameAnimation frameAnimation);
     }
 }
