@@ -23,8 +23,8 @@ class LruCacheManager<K, V> {
     private LruCache<K, V> lruCache;
 
     LruCacheManager() {
-        int maxMemory = (int) Runtime.getRuntime().maxMemory();
-        int mCacheSize = maxMemory / 4;
+        final int maxMemory = (int) Runtime.getRuntime().maxMemory();
+        final int mCacheSize = maxMemory / 4;
         lruCache = new LruCache<K, V>(mCacheSize) {
             @Override
             protected int sizeOf(K key, V value) {

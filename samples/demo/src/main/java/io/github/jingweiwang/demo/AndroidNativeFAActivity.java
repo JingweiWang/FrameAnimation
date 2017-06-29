@@ -24,9 +24,9 @@ public class AndroidNativeFAActivity extends AppCompatActivity {
         });
         ImageView iv_frame = (ImageView) findViewById(R.id.iv_frame);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            frameAnim = (AnimationDrawable) getResources().getDrawable(R.drawable.bullet_anim, null);
+            frameAnim = (AnimationDrawable) getResources().getDrawable(R.drawable.material_anim, null);
         } else {
-            frameAnim = (AnimationDrawable) getResources().getDrawable(R.drawable.bullet_anim);
+            frameAnim = (AnimationDrawable) getResources().getDrawable(R.drawable.material_anim);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             iv_frame.setBackground(frameAnim);

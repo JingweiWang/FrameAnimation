@@ -40,7 +40,7 @@ public class OnceActivity extends AppCompatActivity implements FrameAnimation.Fr
                 start();
             }
         });
-        frameAnimation = new FrameAnimation(this, iv_frame, "bullet_", 0, 0, 25)
+        frameAnimation = new FrameAnimation(this, iv_frame, "material_", 0, 0, 69)
                 .setDuration(50)
                 .setOneShot(true)
                 .setFrameAnimationCallBack(this);

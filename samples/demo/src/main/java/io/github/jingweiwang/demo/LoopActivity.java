@@ -54,7 +54,7 @@ public class LoopActivity extends AppCompatActivity implements FrameAnimation.Fr
                 reset();
             }
         });
-        frameAnimation = new FrameAnimation(this, iv_frame, Ress.BULLET_FRAME_RESS)
+        frameAnimation = new FrameAnimation(this, iv_frame, Ress.MATERIAL_FRAME_RESS)
                 .setDuration(50)
                 .setFrameAnimationCallBack(this);
     }

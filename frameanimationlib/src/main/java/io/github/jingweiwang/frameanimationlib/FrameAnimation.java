@@ -39,7 +39,7 @@ public class FrameAnimation {
     private ImageView imageView;
     private Handler handler = new Handler();
     private LruCacheManager<Integer, BitmapDrawable> lruCacheManager;
-    private Bitmap.Config bitmapConfig = Bitmap.Config.ALPHA_8;
+    private Bitmap.Config bitmapConfig = Bitmap.Config.RGB_565;
     private List<FrameAnimationCallBack> cbFrameAnimationList = new ArrayList<>();
 
     private int[] frameRess;

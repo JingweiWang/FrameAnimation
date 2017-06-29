@@ -17,7 +17,7 @@ FrameAnimation supports Android 4.0 and later.
 If you are building with Gradle, simply add the following line to the `dependencies` section of your `build.gradle` file:
 
 ```groovy
-compile 'io.github.jingweiwang.library:FrameAnimation:0.4.0'
+compile 'io.github.jingweiwang.library:FrameAnimation:0.5.0'
 ```
 
 For full details, visit the documentation on our web site, available in Chinese:
@@ -29,7 +29,7 @@ For full details, visit the documentation on our web site, available in Chinese:
 FrameAnimation now longer has a direct dependency on the Android Support library. Instead, it expects certain part of the support library to be provided by the including application. If you do not include the Android Support Library yourself already, you will have to add the following line to your build.gradle file:
 
 ```groovy
-compile 'com.android.support:appcompat-v7:25.1.0'
+compile 'com.android.support:appcompat-v7:25.3.1'
 ```
 
 ### *Join the FrameAnimation community*

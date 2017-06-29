@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2017 JingweiWang
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,32 +30,42 @@
         android:textSize="18sp"
         android:textStyle="normal|bold" />
 
-    <Button
-        android:id="@+id/btn_start"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="start Loop" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btn_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="stop Loop" />
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:text="start Loop" />
 
-    <Button
-        android:id="@+id/btn_reset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Reset" />
+        <Button
+            android:id="@+id/btn_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:text="stop Loop" />
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:text="Reset" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/iv_frame"
-        android:layout_width="303dp"
-        android:layout_height="230dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_margin="20dp"
-        android:background="@drawable/bullet_0" />
+        android:layout_marginTop="20dp"
+        android:background="@drawable/material_0" />
 </LinearLayout>

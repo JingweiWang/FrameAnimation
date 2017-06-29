@@ -41,7 +41,7 @@ public class OnceAndGoneActivity extends AppCompatActivity implements FrameAnima
                 start();
             }
         });
-        frameAnimation = new FrameAnimation(this, iv_frame, Ress.BULLET_FRAME_RESS)
+        frameAnimation = new FrameAnimation(this, iv_frame, Ress.MATERIAL_FRAME_RESS)
                 .setDuration(50)
                 .setOneShot(true)
                 .setFrameAnimationCallBack(this);
