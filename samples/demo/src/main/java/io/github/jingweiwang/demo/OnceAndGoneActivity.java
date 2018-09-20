@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 JingweiWang
+ * Copyright 2018 JingweiWang
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import io.github.jingweiwang.frameanimationlib.FrameAnimation;
 
 public class OnceAndGoneActivity extends AppCompatActivity implements FrameAnimation.FrameAnimationCallBack {
-    private final String TAG = getClass().getSimpleName();
+    private final String TAG = "OnceAndGoneActivity";
     private FrameAnimation frameAnimation;
     private ImageView iv_frame;
 
@@ -33,18 +32,16 @@ public class OnceAndGoneActivity extends AppCompatActivity implements FrameAnima
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_once_and_gone);
-        Button btn_start = (Button) findViewById(R.id.btn_start);
-        iv_frame = (ImageView) findViewById(R.id.iv_frame);
-        btn_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                start();
-            }
-        });
+
+        iv_frame = findViewById(R.id.iv_frame);
+
+        findViewById(R.id.btn_start).setOnClickListener(v -> start());
+
         frameAnimation = new FrameAnimation(this, iv_frame, Ress.MATERIAL_FRAME_RESS)
                 .setDuration(50)
                 .setOneShot(true)
-                .setFrameAnimationCallBack(this);
+                .setFrameAnimationCallBack(this)
+                .setOpenLog(true);
     }
 
     private void start() {

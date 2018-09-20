@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 JingweiWang
+ * Copyright 2018 JingweiWang
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.github.jingweiwang.frameanimationlib;
 
 import android.graphics.drawable.BitmapDrawable;
-import android.util.LruCache;
+import android.support.annotation.NonNull;
+import android.support.v4.util.LruCache;
 
 class LruCacheManager<K, V> {
-    private LruCache<K, V> lruCache;
+    private final LruCache<K, V> lruCache;
 
-    LruCacheManager() {
-        final int maxMemory = (int) Runtime.getRuntime().maxMemory();
-        final int mCacheSize = maxMemory / 4;
+    LruCacheManager(int distributionRate) {
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory());
+        final int mCacheSize = maxMemory / distributionRate; // 总容量的大小为当前进程可用内存的(1/distributionRate)
         lruCache = new LruCache<K, V>(mCacheSize) {
             @Override
-            protected int sizeOf(K key, V value) {
+            protected int sizeOf(@NonNull K key, @NonNull V value) {
                 if (value instanceof BitmapDrawable) {
                     return ((BitmapDrawable) value).getBitmap().getByteCount();
                 } else {
@@ -41,8 +41,8 @@ class LruCacheManager<K, V> {
         return lruCache.get(key);
     }
 
-    V put(K key, V value) {
-        return lruCache.put(key, value);
+    void put(K key, V value) {
+        lruCache.put(key, value);
     }
 
     void clearLruCache() {
@@ -51,5 +51,17 @@ class LruCacheManager<K, V> {
                 lruCache.evictAll();
             }
         }
+    }
+
+    int getMaxSize() {
+        return lruCache.maxSize();
+    }
+
+    int getSize() {
+        return lruCache.size();
+    }
+
+    String printLruCache() {
+        return lruCache.toString();
     }
 }

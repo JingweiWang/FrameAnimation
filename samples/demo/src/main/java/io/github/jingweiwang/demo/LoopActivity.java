@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 JingweiWang
+ * Copyright 2018 JingweiWang
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,45 +18,29 @@ package io.github.jingweiwang.demo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import io.github.jingweiwang.frameanimationlib.FrameAnimation;
 
 public class LoopActivity extends AppCompatActivity implements FrameAnimation.FrameAnimationCallBack {
-    private final String TAG = getClass().getSimpleName();
+    private final String TAG = "LoopActivity";
     private FrameAnimation frameAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loop);
-        Button btn_start = (Button) findViewById(R.id.btn_start);
-        Button btn_stop = (Button) findViewById(R.id.btn_stop);
-        Button btn_reset = (Button) findViewById(R.id.btn_reset);
-        ImageView iv_frame = (ImageView) findViewById(R.id.iv_frame);
-        btn_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                start();
-            }
-        });
-        btn_stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stop();
-            }
-        });
-        btn_reset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reset();
-            }
-        });
-        frameAnimation = new FrameAnimation(this, iv_frame, Ress.MATERIAL_FRAME_RESS)
+
+        ImageView iv_frame = findViewById(R.id.iv_frame);
+
+        findViewById(R.id.btn_start).setOnClickListener(v -> start());
+        findViewById(R.id.btn_stop).setOnClickListener(v -> stop());
+        findViewById(R.id.btn_reset).setOnClickListener(v -> reset());
+
+        frameAnimation = new FrameAnimation(this, 4, iv_frame, Ress.MATERIAL_FRAME_RESS)
                 .setDuration(50)
-                .setFrameAnimationCallBack(this);
+                .setFrameAnimationCallBack(this)
+                .setOpenLog(false);
     }
 
     private void start() {

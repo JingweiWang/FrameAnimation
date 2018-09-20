@@ -1,5 +1,5 @@
 /*
- *    Copyright 2017 JingweiWang
+ *    Copyright 2018 JingweiWang
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 package io.github.jingweiwang.frameanimationlib;
 
 import android.content.Context;
@@ -22,7 +21,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IntRange;
 import android.util.Log;
 import android.widget.ImageView;
@@ -33,14 +31,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FrameAnimation {
-    private final String TAG = getClass().getSimpleName();
+    private final String TAG = "FrameAnimation";
 
-    private Context context;
-    private ImageView imageView;
-    private Handler handler = new Handler();
+    private final Context context;
+    private final ImageView imageView;
+    private final Handler handler = new Handler();
+    private final List<FrameAnimationCallBack> cbFrameAnimationList = new ArrayList<>();
+
     private LruCacheManager<Integer, BitmapDrawable> lruCacheManager;
     private Bitmap.Config bitmapConfig = Bitmap.Config.RGB_565;
-    private List<FrameAnimationCallBack> cbFrameAnimationList = new ArrayList<>();
+    private InputStream inputStreamForDisplayImage;
+    private Bitmap bitmapForDisplayImage;
+    private BitmapDrawable bitmapDrawableForDisplayImage;
+    private BitmapFactory.Options optionsForDisplayImage;
 
     private int[] frameRess;
     private int frameRessBound;
@@ -48,63 +51,112 @@ public class FrameAnimation {
     private boolean running = false;
     private int duration = 50;
     private int curFrame = 0;
+    private boolean openLog = false;
+
+    private FrameAnimation(Context context, ImageView imageView) {
+        this.context = context.getApplicationContext();
+        this.imageView = imageView;
+    }
 
     /**
      * 初始化一个帧序列动画资源
+     * <p>
+     * 默认LruCache的总容量的大小为当前进程可用内存的(1/8)
      *
      * @param context   当前上下文
      * @param imageView 容器
      * @param frameRess 图像资源号数组
      */
     public FrameAnimation(Context context, ImageView imageView, int[] frameRess) {
-        this.context = context.getApplicationContext();
-        this.imageView = imageView;
+        this(context, imageView);
         this.frameRess = frameRess;
+        this.frameRessBound = frameRess.length - 1;
         initLruCache();
     }
 
     /**
      * 初始化一个帧序列动画资源
      *
+     * @param context          当前上下文
+     * @param distributionRate LruCache的总容量的大小为当前进程可用内存的(1/distributionRate), 只可从4和8中选取, 默认值为8
+     * @param imageView        容器
+     * @param frameRess        图像资源号数组
+     */
+    public FrameAnimation(Context context, int distributionRate, ImageView imageView, int[] frameRess) {
+        this(context, imageView);
+        this.frameRess = frameRess;
+        this.frameRessBound = frameRess.length - 1;
+        initLruCache(distributionRate);
+    }
+
+    /**
+     * 初始化一个帧序列动画资源
+     * <p>
+     * 默认LruCache的总容量的大小为当前进程可用内存的(1/8)
+     *
      * @param context     当前上下文
      * @param imageView   容器
      * @param prefix      图像资源名前缀
-     * @param fristSuffix 首个图像资源名的后缀
+     * @param firstSuffix 首个图像资源名的后缀
      * @param numberBit   图像资源名后缀位数, 如果为0则按照实际位数设置
-     * @param totle       图像资源个数
+     * @param total       图像资源个数
      */
-    public FrameAnimation(Context context, ImageView imageView, String prefix, @IntRange(from = 0) int fristSuffix, @IntRange(from = 0, to = 5) int numberBit, @IntRange(from = 1) int totle) {
-        this.context = context.getApplicationContext();
-        this.imageView = imageView;
-        this.frameRess = getFrameRess(prefix, fristSuffix, numberBit, totle);
+    public FrameAnimation(Context context, ImageView imageView, String prefix,
+                          @IntRange(from = 0) int firstSuffix, @IntRange(from = 0, to = 5) int numberBit,
+                          @IntRange(from = 1) int total) {
+        this(context, imageView);
+        this.frameRess = getFrameRess(prefix, firstSuffix, numberBit, total);
+        this.frameRessBound = frameRess.length - 1;
         initLruCache();
     }
 
     /**
-     * Starts the animation from the first frame, looping if necessary.
+     * 初始化一个帧序列动画资源
+     *
+     * @param context          当前上下文
+     * @param distributionRate LruCache的总容量的大小为当前进程可用内存的(1/distributionRate), 只可从4和8中选取, 默认值为8
+     * @param imageView        容器
+     * @param prefix           图像资源名前缀
+     * @param firstSuffix      首个图像资源名的后缀
+     * @param numberBit        图像资源名后缀位数, 如果为0则按照实际位数设置
+     * @param total            图像资源个数
      */
-    public void start() {
-        if (running) {
-            Log.w(TAG, "This frame animation is already running.");
-            return;
-        }
-        preDisplay(frameRess);
-        while (true) {
-            if (checkCached(frameRess)) {
-                running = true;
-                setCbStart();
-                playConstant(curFrame);
-                break;
-            }
-        }
+    public FrameAnimation(Context context, int distributionRate, ImageView imageView, String prefix,
+                          @IntRange(from = 0) int firstSuffix, @IntRange(from = 0, to = 5) int numberBit,
+                          @IntRange(from = 1) int total) {
+        this(context, imageView);
+        this.frameRess = getFrameRess(prefix, firstSuffix, numberBit, total);
+        this.frameRessBound = frameRess.length - 1;
+        initLruCache(distributionRate);
     }
 
     /**
-     * Stops the animation at the current frame.
+     * 从第一帧开始播放帧动画, 如果设置了循环将会循环播放
+     *
+     * @see #setOneShot(boolean)
+     * @see #isOneShot()
+     */
+    public void start() {
+        if (running) {
+            if (openLog) {
+                Log.w(TAG, "This frame animation is already running.");
+            }
+            return;
+        }
+
+        running = true;
+        setCbStart();
+        playConstant(curFrame);
+    }
+
+    /**
+     * 停止播放帧动画并保持显示当前帧
      */
     public void stop() {
         if (!running) {
-            Log.w(TAG, "This frame animation is not running.");
+            if (openLog) {
+                Log.w(TAG, "This frame animation is not running.");
+            }
             return;
         }
         running = false;
@@ -123,6 +175,7 @@ public class FrameAnimation {
      * 设置每帧的持续时间
      *
      * @param duration 单位为毫秒, 默认值为50毫秒
+     * @return FrameAnimation
      */
     public FrameAnimation setDuration(int duration) {
         this.duration = duration;
@@ -139,9 +192,10 @@ public class FrameAnimation {
     }
 
     /**
-     * Sets whether the animation should play once or repeat.
+     * 设置是否帧动画只播放一次
      *
-     * @param oneShot Pass true if the animation should only play once
+     * @param oneShot 如果是 true, 则只播放一次; 否则重复播放
+     * @return FrameAnimation
      */
     public FrameAnimation setOneShot(boolean oneShot) {
         this.oneShot = oneShot;
@@ -151,7 +205,9 @@ public class FrameAnimation {
     /**
      * 选择图片Bitmap.Config参数
      *
-     * @param config 可选 ALPHA_8, RGB_565, ARGB_8888
+     * @param config 可选 ALPHA_8, RGB_565, ARGB_8888等
+     * @return FrameAnimation
+     * @see Bitmap.Config
      */
     public FrameAnimation setBitmapConfig(Bitmap.Config config) {
         this.bitmapConfig = config;
@@ -171,10 +227,14 @@ public class FrameAnimation {
      * 重置当前帧序数
      * <p>
      * 当使用 stop() 后调用此参数再次使用 start(), 会从首帧开始播放
+     *
+     * @return FrameAnimation
      */
     public FrameAnimation reset() {
         if (running) {
-            Log.w(TAG, "This frame animation is already running, forbidden to reset.");
+            if (openLog) {
+                Log.w(TAG, "This frame animation is already running, forbidden to reset.");
+            }
             return this;
         }
         this.curFrame = 0;
@@ -182,9 +242,9 @@ public class FrameAnimation {
     }
 
     /**
-     * Indicates whether the animation is currently running or not.
+     * 帧动画当前是否正在播放
      *
-     * @return true if the animation is running, false otherwise
+     * @return 如果是 true, 则正在播放; 否则不在播放
      */
     public boolean isRunning() {
         return running;
@@ -199,6 +259,9 @@ public class FrameAnimation {
 
     /**
      * 设置frameAnimation回调
+     *
+     * @param frameAnimationCallBack 监听器
+     * @return FrameAnimation
      */
     public FrameAnimation setFrameAnimationCallBack(FrameAnimationCallBack frameAnimationCallBack) {
         this.cbFrameAnimationList.add(frameAnimationCallBack);
@@ -206,19 +269,35 @@ public class FrameAnimation {
     }
 
     private void initLruCache() {
-        lruCacheManager = new LruCacheManager<>();
+        initLruCache(8);
     }
 
-    private int[] getFrameRess(String prefix, int fristSuffix, int numberBit, int totle) {
-        int[] frameRess = new int[totle];
+    private void initLruCache(int distributionRate) {
+        switch (distributionRate) {
+            case 4:
+                lruCacheManager = new LruCacheManager<>(4);
+                break;
+            case 8:
+                lruCacheManager = new LruCacheManager<>(8);
+                break;
+            default:
+                lruCacheManager = new LruCacheManager<>(8);
+                Log.e(TAG, "构造器distributionRate参数只能填入4或8, 非法填入! 取默认值8!");
+                break;
+        }
+    }
+
+    private int[] getFrameRess(final String prefix, final int firstSuffix, final int numberBit, final int total) {
+        int[] frameRess = new int[total];
         String suffix;
-        for (int i = 0; i < totle; i++) {
+        for (int i = 0; i < total; i++) {
             if (0 != numberBit) {
-                suffix = String.format("%0" + numberBit + "d", fristSuffix + i);
+                suffix = String.format("%0" + numberBit + "d", firstSuffix + i);
             } else {
-                suffix = String.valueOf(fristSuffix + i);
+                suffix = String.valueOf(firstSuffix + i);
             }
-            frameRess[i] = context.getResources().getIdentifier(prefix + suffix, "drawable", context.getPackageName());
+            frameRess[i] = context.getResources().getIdentifier(prefix + suffix,
+                    "drawable", context.getPackageName());
         }
         return frameRess;
     }
@@ -273,46 +352,106 @@ public class FrameAnimation {
         }
     }
 
-    private void preDisplay(int[] frameRess) {
-        this.frameRessBound = frameRess.length - 1;
-        for (int ResId : frameRess) {
-            if (lruCacheManager.get(ResId) == null || lruCacheManager.get(ResId).getBitmap().isRecycled()) {
-                BitmapFactory.Options opt = new BitmapFactory.Options();
-                opt.inJustDecodeBounds = false;
-                opt.inPreferredConfig = bitmapConfig;
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-                    opt.inPurgeable = true;
-                    opt.inInputShareable = true;
-                }
-                InputStream inputStream = context.getResources().openRawResource(ResId);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, opt);
-                BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), bitmap);
-                lruCacheManager.put(ResId, bitmapDrawable);
-                try {
-                    inputStream.close();
-                } catch (IOException ignored) {
-                }
+    private int calculateInSampleSize(BitmapFactory.Options options, final int reqWidth, final int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
             }
         }
+        return inSampleSize;
     }
 
-    private boolean checkCached(int[] frameRess) {
-        boolean checkResult = true;
-        for (int ResId : frameRess) {
-            if (lruCacheManager.get(ResId) == null) {
-                checkResult = false;
+    private void displayImage(final int ResId) {
+        if (oneShot || lruCacheManager.get(ResId) == null) {
+            if (openLog) {
+                Log.w(TAG, "miss displayImage: " + lruCacheManager.printLruCache() + " ResId: " + ResId);
             }
-        }
-        return checkResult;
-    }
+            optionsForDisplayImage = new BitmapFactory.Options();
+            optionsForDisplayImage.inJustDecodeBounds = true;
+            BitmapFactory.decodeResource(context.getResources(), ResId, optionsForDisplayImage);
+            optionsForDisplayImage.inSampleSize = calculateInSampleSize(optionsForDisplayImage,
+                    imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
+            optionsForDisplayImage.inJustDecodeBounds = false;
+            optionsForDisplayImage.inPreferredConfig = bitmapConfig;
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                optionsForDisplayImage.inPurgeable = true;
+                optionsForDisplayImage.inInputShareable = true;
+            }
+            inputStreamForDisplayImage = context.getResources().openRawResource(ResId);
+            bitmapForDisplayImage = BitmapFactory.decodeStream(inputStreamForDisplayImage,
+                    null, optionsForDisplayImage);
+            bitmapDrawableForDisplayImage = new BitmapDrawable(context.getResources(), bitmapForDisplayImage);
+            try {
+                inputStreamForDisplayImage.close();
+            } catch (IOException ignored) {
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                imageView.setBackground(bitmapDrawableForDisplayImage);
+            } else {
+                imageView.setBackgroundDrawable(bitmapDrawableForDisplayImage);
+            }
 
-    private void displayImage(@DrawableRes int ResId) {
-        if (lruCacheManager.get(ResId) == null) return;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            imageView.setBackground(lruCacheManager.get(ResId));
+            if (bitmapForDisplayImage.getByteCount() + lruCacheManager.getSize() < lruCacheManager.getMaxSize() && !oneShot) {
+                lruCacheManager.put(ResId, bitmapDrawableForDisplayImage);
+            }
         } else {
-            imageView.setBackgroundDrawable(lruCacheManager.get(ResId));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                imageView.setBackground(lruCacheManager.get(ResId));
+            } else {
+                imageView.setBackgroundDrawable(lruCacheManager.get(ResId));
+            }
+            if (openLog) {
+                Log.w(TAG, lruCacheManager.printLruCache());
+            }
+
+            recycleForDisplayImage();
         }
+    }
+
+    private void recycleForDisplayImage() {
+        if (optionsForDisplayImage != null) {
+            optionsForDisplayImage = null;
+        }
+        if (bitmapForDisplayImage != null) {
+            bitmapForDisplayImage.recycle();
+            bitmapForDisplayImage = null;
+        }
+        if (bitmapDrawableForDisplayImage != null) {
+            bitmapDrawableForDisplayImage.setCallback(null);
+            bitmapDrawableForDisplayImage.getBitmap().recycle();
+            bitmapDrawableForDisplayImage = null;
+        }
+        if (inputStreamForDisplayImage != null) {
+            inputStreamForDisplayImage = null;
+        }
+    }
+
+    /**
+     * 是否开启Log
+     *
+     * @return 如果为 true 则已经打开, false 为已经关闭
+     */
+    public boolean isOpenLog() {
+        return openLog;
+    }
+
+    /**
+     * Log开关
+     *
+     * @param openLog true 为打开, false 为关闭
+     * @return FrameAnimation
+     */
+    public FrameAnimation setOpenLog(boolean openLog) {
+        this.openLog = openLog;
+        return this;
     }
 
     /**
